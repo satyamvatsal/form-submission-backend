@@ -15,9 +15,11 @@ async function insertStudent(name, email, scholar_no, section, branch, phone) {
     `;
     const values = [scholar_no, name, email, phone, branch, section];
     const result = await pool.query(query, values);
-    return result;
+    if (result.rows.length > 0) return true;
+    return false;
   } catch (err) {
-    return err;
+    console.log("Error while inserting data", err);
+    return false;
   }
 }
 async function isUserExists(email, scholar_no, phone) {

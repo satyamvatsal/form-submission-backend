@@ -24,10 +24,14 @@ router.post("/submit", async (req, res) => {
       branch,
       phone,
     );
-    res.status(202).json({
-      success: true,
-      message: "You are registered successfully!",
-      student: result.rows[0],
+    if (result === true)
+      res.status(202).json({
+        success: result,
+        message: "You are registered successfully!",
+      });
+    return res.status(500).json({
+      success: result,
+      message: "Internal Server Error",
     });
     console.log(`User ${name} registered successfully.`);
   } catch (err) {
