@@ -13,7 +13,7 @@ router.post("/submit", async (req, res) => {
     if (userExists === true) {
       console.log("user exists: ", userExists);
       return res
-        .status(400)
+        .status(409)
         .json({ success: false, message: "Already registered" });
     }
     const result = await insertStudent(
