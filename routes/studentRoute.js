@@ -4,11 +4,12 @@ const { isUserExists, insertStudent } = require("../database/queries");
 
 router.post("/submit", async (req, res) => {
   try {
-    const { name, email, scholar_no, phone, branch, section } = req.body;
+    const { name, email, scholar_no, phone, branch, section, college } =
+      req.body;
     if (!email || !name || !scholar_no || !phone || !branch || !section) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    console.log(email, scholar_no, phone);
+    console.log(email, scholar_no, phone, college);
     const userExists = await isUserExists(email, scholar_no, phone);
     if (userExists === true) {
       console.log("user exists: ", userExists);
@@ -23,6 +24,7 @@ router.post("/submit", async (req, res) => {
       section,
       branch,
       phone,
+      college,
     );
     if (result === true)
       res.status(202).json({

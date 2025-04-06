@@ -6,14 +6,22 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-async function insertStudent(name, email, scholar_no, section, branch, phone) {
+async function insertStudent(
+  name,
+  email,
+  scholar_no,
+  section,
+  branch,
+  phone,
+  college,
+) {
   try {
     const query = `
-                        INSERT INTO students (scholar_no, name, email, phone, branch, section)
-                        VALUES ($1, $2, $3, $4, $5, $6)
+                        INSERT INTO students (scholar_no, name, email, phone, branch, section,college)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7)
                         RETURNING *;
     `;
-    const values = [scholar_no, name, email, phone, branch, section];
+    const values = [scholar_no, name, email, phone, branch, section, college];
     const result = await pool.query(query, values);
     if (result.rows.length > 0) return true;
     return false;
