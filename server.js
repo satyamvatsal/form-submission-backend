@@ -1,16 +1,31 @@
 const express = require("express");
-const { Pool } = require("pg");
 const cors = require("cors");
-const testConnection = require("./database/testConnection");
+const connectMongo = require("./database/mongodb");
 const studentRoutes = require("./routes/studentRoute");
 const adminRoutes = require("./routes/adminRoute");
 require("dotenv").config();
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
+connectMongo();
 const app = express();
 const PORT = process.env.PORT || 5000;
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://10.3.141.39:5173",
+  "https://register.visioncse.tech",
+];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS: " + origin));
+    }
+  },
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.set("trust proxy", true);
 app.use(express.urlencoded({ extended: false }));
 app.use("/student", studentRoutes);
 app.use("/admin", adminRoutes);

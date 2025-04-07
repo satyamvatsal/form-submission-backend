@@ -10,18 +10,18 @@ async function insertStudent(
   name,
   email,
   scholar_no,
-  section,
+  year,
   branch,
   phone,
   college,
 ) {
   try {
     const query = `
-                        INSERT INTO students (scholar_no, name, email, phone, branch, section,college)
+                        INSERT INTO students (scholar_no, name, email, phone, branch, year, college)
                         VALUES ($1, $2, $3, $4, $5, $6, $7)
                         RETURNING *;
     `;
-    const values = [scholar_no, name, email, phone, branch, section, college];
+    const values = [scholar_no, name, email, phone, branch, year, college];
     const result = await pool.query(query, values);
     if (result.rows.length > 0) return true;
     return false;
@@ -30,22 +30,18 @@ async function insertStudent(
     return false;
   }
 }
-async function isUserExists(email, scholar_no, phone) {
+async function isUserExists(email, phone) {
   try {
     const checkQuery = `
-                  SELECT * FROM students WHERE scholar_no = $1 OR email = $2 OR phone = $3;
+                  SELECT 1 FROM students WHERE email = $1 OR phone = $2 LIMIT 1;
               `;
-    const checkResult = await pool.query(checkQuery, [
-      scholar_no,
-      email,
-      phone,
-    ]);
+    const checkResult = await pool.query(checkQuery, [email, phone]);
     if (checkResult.rows.length > 0) {
       return true;
     } else return false;
   } catch (err) {
     console.log("Error while checking user: ", err);
-    return -1;
+    throw Error("DB error");
   }
 }
 async function returnUsers() {
