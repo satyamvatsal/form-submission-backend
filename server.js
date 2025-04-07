@@ -8,10 +8,9 @@ connectMongo();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://10.3.141.39:5173",
-  "https://register.visioncse.tech",
   "https://admin.visioncse.tech",
+  "https://visioncse.tech",
+  "https://www.visioncse.tech",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
