@@ -11,6 +11,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://10.3.141.39:5173",
   "https://register.visioncse.tech",
+  "https://admin.visioncse.tech",
 ];
 const corsOptions = {
   origin: function (origin, callback) {
