@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const fastcsv = require("fast-csv");
+const keepLogs = require("../utils/keepLogs");
 const { returnUsers } = require("../database/queries");
+
 router.get("/students", async (req, res) => {
+  keepLogs();
   const key = req.headers["admin-key"];
   if (key === process.env.ADMIN_KEY) {
     const data = await returnUsers();

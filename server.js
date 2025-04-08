@@ -24,7 +24,7 @@ const corsOptions = {
   },
   credentials: true,
 };
-app.use(cors(corsOptions));
+app.use(cors());
 app.set("trust proxy", true);
 app.use(express.urlencoded({ extended: false }));
 app.use("/student", studentRoutes);

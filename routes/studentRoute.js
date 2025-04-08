@@ -2,20 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { isUserExists, insertStudent } = require("../database/queries");
 const keepLogs = require("../utils/keepLogs");
+const sendMail = require("../utils/sendMail");
 
 router.post("/submit", async (req, res) => {
   try {
     keepLogs(req);
     const { name, email, scholar_no, phone, branch, year, college } = req.body;
-    if (
-      !email ||
-      !name ||
-      !scholar_no ||
-      !phone ||
-      !branch ||
-      !year ||
-      !college
-    ) {
+    if (!email || !name || !phone || !college) {
       return res.status(400).json({ message: "All fields are required" });
     }
     const userExists = await isUserExists(email, phone);
@@ -35,11 +28,17 @@ router.post("/submit", async (req, res) => {
       college,
     );
     if (result === true) {
-      return res.status(202).json({
+      console.log(`User ${email} registered successfully.`);
+      res.status(202).json({
         success: result,
         message: "You are registered successfully!",
       });
-      console.log(`User ${email} registered successfully.`);
+      try {
+        sendMail(name, email);
+      } catch (err) {
+        console.log("Error sending mail: ", err);
+      }
+      return;
     }
     return res.status(500).json({
       success: result,
