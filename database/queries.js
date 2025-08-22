@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const { checkout } = require("../routes/studentRoute");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 const pool = new Pool({

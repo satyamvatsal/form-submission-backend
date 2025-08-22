@@ -2,10 +2,12 @@ const express = require("express");
 const router = express.Router();
 const fastcsv = require("fast-csv");
 const keepLogs = require("../utils/keepLogs");
-const { returnUsers } = require("../database/queries");
+const {
+  returnUsers,
+  returnUsersCSV,
+} = require("../controllers/studentController");
 
 router.get("/students", async (req, res) => {
-  keepLogs();
   const key = req.headers["admin-key"];
   if (key === process.env.ADMIN_KEY) {
     const data = await returnUsers();
@@ -19,7 +21,7 @@ router.get("/download-csv", async (req, res) => {
     const key = req.headers["admin-key"];
     console.log(key);
     if (key === process.env.ADMIN_KEY) {
-      const data = await returnUsers();
+      const data = await returnUsersCSV();
       res.setHeader("Content-Disposition", "attachment; filename=users.csv");
       res.setHeader("Content-Type", "text/csv");
       const csvStream = fastcsv.format({ headers: true });

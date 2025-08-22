@@ -19,11 +19,13 @@
   },
   "homepage": "https://github.com/satyamvatsal/form-submission-backend#readme",
   "dependencies": {
+    "@azure/storage-blob": "^12.28.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "fast-csv": "^5.0.2",
     "mongoose": "^8.13.2",
+    "multer": "^2.0.2",
     "nodemailer": "^6.10.0",
     "pg": "^8.13.3"
   },

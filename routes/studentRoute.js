@@ -1,44 +1,71 @@
 const express = require("express");
 const router = express.Router();
-const { isUserExists, insertStudent } = require("../database/queries");
+const uploadToAzureBlob = require("../utils/uploadFiles");
+const {
+  isUserExists,
+  insertStudent,
+} = require("../controllers/studentController");
 const keepLogs = require("../utils/keepLogs");
-const sendMail = require("../utils/sendMail");
+const uploadMiddleWare = require("../middlewares/uploadMiddleware");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-router.post("/submit", async (req, res) => {
+router.post("/submit", uploadMiddleWare, async (req, res) => {
   try {
     keepLogs(req);
-    const { name, email, scholar_no, phone, branch, year, college } = req.body;
-    if (!email || !name || !phone || !college) {
+    const {
+      name,
+      email,
+      scholar_no,
+      phone,
+      branch,
+      github_profile,
+      codeforces_profile,
+      codechef_profile,
+    } = req.body;
+    console.log(req.body);
+    if (!email || !name || !phone || !scholar_no) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    const userExists = await isUserExists(email, phone);
+    const userExists = await isUserExists(email, phone, scholar_no);
     if (userExists === true) {
-      console.log("user exists: ", userExists);
+      console.log("user exists: ", req.body);
       return res
         .status(409)
         .json({ success: false, message: "Already registered" });
+    }
+
+    let resumeUrl = null;
+    let resumeLocalPath = "";
+    if (req.file) {
+      try {
+        const blobName = `${Date.now()}-${req.file.originalname}`;
+        resumeLocalPath = `${Date.now()}-${scholar_no}-${req.file.originalname}`;
+        resumeUrl = await uploadToAzureBlob(req.file.path, blobName);
+        console.log("Resume uploaded to Azure:", resumeUrl);
+      } catch (err) {
+        console.error("Error uploading resume to Azure:", err);
+      }
     }
     const result = await insertStudent(
       name,
       email,
       scholar_no,
-      year,
       branch,
       phone,
-      college,
+      resumeUrl,
+      resumeLocalPath,
+      github_profile,
+      codeforces_profile,
+      codechef_profile,
     );
     if (result === true) {
       console.log(`User ${email} registered successfully.`);
-      res.status(202).json({
+      return res.status(202).json({
         success: result,
         message: "You are registered successfully!",
       });
-      try {
-        sendMail(name, email);
-      } catch (err) {
-        console.log("Error sending mail: ", err);
-      }
-      return;
     }
     return res.status(500).json({
       success: result,
@@ -47,22 +74,6 @@ router.post("/submit", async (req, res) => {
   } catch (err) {
     console.log("Error inserting student data: ", err);
     res.status(500).json({ success: false, message: "Internal Server Error" });
-  }
-});
-router.get("/check", async (req, res) => {
-  const { email, phone, scholar_no } = req.body;
-  if (!email && !phone && !scholar_no) {
-    return res
-      .status(400)
-      .json({ message: "Provide scholar number, email, or phone to check." });
-  }
-  const result = await isUserExists(email, scholar_no, phone);
-  if (result === true) {
-    const link = "https://chat.whatsapp.com/HZNIUnZvqFy2euT3TljWf2";
-    return res.status(200).json({ exists: true, link });
-  } else if (result === false) return res.status(200).json({ exists: false });
-  else {
-    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 module.exports = router;
